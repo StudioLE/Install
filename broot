@@ -3,7 +3,7 @@ set -euo pipefail
 
 COMMAND="broot"
 SOURCE="https://dystroy.org/broot/download/x86_64-linux/broot"
-DESTINATION="/usr/local/bin/broot"
+DESTINATION="/usr/local/bin/${COMMAND}"
 
 if [[ $(/usr/bin/id -u) -ne 0 ]]
 then
