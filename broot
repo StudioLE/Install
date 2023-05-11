@@ -11,7 +11,9 @@ then
   exit 1
 fi
 
+set +e
 WHICH=$(which "${COMMAND}")
+set -e
 
 if [[ "${WHICH}" != "" ]]
 then
@@ -21,13 +23,13 @@ then
 fi
 
 echo "Installing ${COMMAND}"
-echo "From: ${SOURCE}"
-echo "To: ${DESTINATION}"
+echo "  Source: ${SOURCE}"
+echo "  Destination: ${DESTINATION}"
 
 sudo curl "${SOURCE}" \
   --output "${DESTINATION}" \
   --progress-bar
 sudo chmod +x "${DESTINATION}"
 
-echo "Run the following to confirm:"
+echo "Complete. Confirm with:"
 echo "  ${COMMAND} --version"
