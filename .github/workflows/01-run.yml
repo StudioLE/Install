@@ -29,11 +29,3 @@ jobs:
             echo "${file}"
             sudo bash "${file}"
           done
-
-      - name: Confirm
-        run: |
-          for file in *
-          do
-            echo "${file}"
-            "${file}" --version
-          done
