@@ -1,0 +1,32 @@
+name: Run
+
+on:
+  workflow_call:
+    inputs:
+      os:
+        required: true
+        type: string
+      command:
+        required: true
+        type: string
+
+jobs:
+
+  run:
+    name: Run
+    runs-on: ${{ inputs.os }}
+    steps:
+
+      - name: Read Metadata
+        run: |
+          echo "OS: ${{ inputs.os }}"
+          echo "Command: ${{ inputs.command }}"
+
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Run
+        run: ./${{ inputs.command }}
+
+      - name: Confirm
+        run: ${{ inputs.command }} --version
