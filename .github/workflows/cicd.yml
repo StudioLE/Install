@@ -1,0 +1,28 @@
+name: CI/CD
+
+on:
+  push:
+
+jobs:
+
+  analysis:
+    name: Create Release
+    uses: StudioLE/Actions/.github/workflows/01-semantic-release.yml@main
+    secrets: inherit
+
+  run:
+    name: Run
+    needs: analysis
+    uses: ./.github/workflows/02-run.yml
+    strategy:
+      matrix:
+        os:
+          - ubuntu-22.04
+          - ubuntu-20.04
+        command:
+          - broot
+          - ncdu
+    with:
+      os: ${{ matrix.os }}
+      command: ${{ matrix.command }}
+    secrets: inherit
