@@ -25,7 +25,7 @@ jobs:
       - name: Run
         run: |
           set -euo pipefail
-          for file in *
+          for file in *.sh
           do
             echo "${file}"
             sudo bash "${file}"
