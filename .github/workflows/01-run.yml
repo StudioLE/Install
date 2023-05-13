@@ -24,6 +24,7 @@ jobs:
 
       - name: Run
         run: |
+          set -euo pipefail
           for file in *
           do
             echo "${file}"

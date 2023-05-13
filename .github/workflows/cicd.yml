@@ -24,13 +24,13 @@ jobs:
     uses: StudioLE/Actions/.github/workflows/01-semantic-release.yml@main
     secrets: inherit
     
-  publish:
-    name: Publish
-    needs: 
-      - release
-      - run
-    if: ${{ needs.release.outputs.version != '0.0.0' }}
-    uses: ./.github/workflows/05-publish.yml
-    with:
-      version: ${{ needs.release.outputs.version }}
-    secrets: inherit
+#  publish:
+#    name: Publish
+#    needs: 
+#      - release
+#      - run
+#    if: ${{ needs.release.outputs.version != '0.0.0' }}
+#    uses: ./.github/workflows/05-publish.yml
+#    with:
+#      version: ${{ needs.release.outputs.version }}
+#    secrets: inherit
