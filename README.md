@@ -19,6 +19,32 @@ curl --location --progress-bar https://raw.githubusercontent.com/StudioLE/Instal
 curl --location --progress-bar https://raw.githubusercontent.com/StudioLE/Install/main/broot.sh | sudo bash
 ```
 
+### [Docker](https://www.docker.com/)
+
+``` bash
+curl --location --progress-bar https://raw.githubusercontent.com/StudioLE/Install/main/docker.sh | sudo bash
+```
+
+### [Kubernetes](https://kubernetes.io/)
+
+``` bash
+curl --location --progress-bar https://raw.githubusercontent.com/StudioLE/Install/main/docker.sh | sudo bash
+curl --location --progress-bar https://raw.githubusercontent.com/StudioLE/Install/main/cri-dockerd.sh | sudo bash
+curl --location --progress-bar https://raw.githubusercontent.com/StudioLE/Install/main/kubernetes.sh | sudo bash
+```
+
+### [Hugo](https://gohugo.io/)
+
+``` bash
+curl --location --progress-bar https://raw.githubusercontent.com/StudioLE/Install/main/hugo.sh | sudo bash
+```
+
+### [micro](https://micro-editor.github.io/)
+
+``` bash
+curl --location --progress-bar https://raw.githubusercontent.com/StudioLE/Install/main/micro.sh | sudo bash
+```
+
 ### [ncdu](https://dev.yorhel.nl/ncdu)
 
 ``` bash
@@ -35,18 +61,4 @@ curl --location --progress-bar https://raw.githubusercontent.com/StudioLE/Instal
 
 ``` bash
 curl --location --progress-bar https://raw.githubusercontent.com/StudioLE/Install/main/dotnet-sdk.sh | sudo bash
-```
-
-### [Docker](https://www.docker.com/)
-
-``` bash
-curl --location --progress-bar https://raw.githubusercontent.com/StudioLE/Install/main/docker.sh | sudo bash
-```
-
-### [Kubernetes](https://kubernetes.io/)
-
-``` bash
-curl --location --progress-bar https://raw.githubusercontent.com/StudioLE/Install/main/docker.sh | sudo bash
-curl --location --progress-bar https://raw.githubusercontent.com/StudioLE/Install/main/cri-dockerd.sh | sudo bash
-curl --location --progress-bar https://raw.githubusercontent.com/StudioLE/Install/main/kubernetes.sh | sudo bash
 ```
