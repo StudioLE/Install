@@ -36,19 +36,7 @@ validate-is-root() {
   fi
 }
 
-validate-not-installed() {
-  WHICH=$(which "${COMMAND}")  
-  if [[ "${WHICH}" != "" ]]
-  then
-    echo-warning "${COMMAND} is already installed:"
-    echo-subsidiary "Path: ${WHICH}"
-    exit 2
-  fi
-}
-
 validate-is-root
-validate-not-installed
-
 
 echo-information "Installing ${COMMAND}"
 echo-subsidiary "Source: ${SOURCE}"
@@ -93,7 +81,7 @@ fi
 echo-step "Install Docker Engine"
 if ! (
   set -e
-  apt-get update
+  apt-get update --quiet
   apt-get install --quiet --yes \
     docker-ce \
     docker-ce-cli \
