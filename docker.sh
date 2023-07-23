@@ -2,7 +2,7 @@
 set -uo pipefail
 
 COMMAND="docker"
-DOCKER_USER="$1"
+DOCKER_USER="${1:-}"
 
 # Install docker
 # Source: https://docs.docker.com/engine/install/ubuntu/
