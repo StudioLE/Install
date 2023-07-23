@@ -79,7 +79,7 @@ fi
 echo-step "Install .NET Runtime"
 if ! (
   set -e
-  apt-get update --quiet > /dev/null
+  apt-get update > /dev/null
   apt-get install ${PACKAGE} --yes --quiet
   )
 then
