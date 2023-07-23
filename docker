@@ -102,7 +102,6 @@ if [[ "${DOCKER_USER}" == "" ]]
 then
   echo-warning "No docker user provided"
   echo-subsidiary "Skipping post install steps"
-  exit 0
 else
 
   # Post install steps
