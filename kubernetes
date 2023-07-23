@@ -45,10 +45,11 @@ echo-step "Installing apt dependencies"
 if ! (
   set -e
   apt-get update > /dev/null
-  apt-get install --quiet --yes \
+  apt-get install --yes \
     ca-certificates \
     curl \
-    gnupg
+    gnupg \
+    > /dev/null
 )
 then
   echo-error "Failed to install apt dependencies"
@@ -72,10 +73,11 @@ echo-step "Install kubelet, kubeadm and kubectl"
 if ! (
   set -e
   apt-get update > /dev/null
-  apt-get install --quiet --yes \
+  apt-get install --yes \
     kubelet \
     kubeadm \
-    kubectl
+    kubectl \
+    > /dev/null
 )
 then
   echo-error "Failed to install kubelet, kubeadm and kubectl"

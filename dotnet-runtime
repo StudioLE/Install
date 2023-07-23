@@ -72,7 +72,7 @@ echo-step "Install .NET Runtime"
 if ! (
   set -e
   apt-get update > /dev/null
-  apt-get install ${PACKAGE} --yes --quiet
+  apt-get install ${PACKAGE} --yes > /dev/null
   )
 then
   echo-error "Failed to install .NET Runtime"

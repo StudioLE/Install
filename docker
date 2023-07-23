@@ -46,17 +46,18 @@ echo-information "Installing ${COMMAND}"
 echo-step "Uninstall old versions"
 for PACKAGE in docker docker-engine docker.io containerd runc
 do
-  apt-get remove "${PACKAGE}" --quiet --yes
+  apt-get remove "${PACKAGE}" --yes > /dev/null
 done
 
 echo-step "Installing apt dependencies"
 if ! (
   set -e
   apt-get update > /dev/null
-  apt-get install --quiet --yes \
+  apt-get install --yes \
     ca-certificates \
     curl \
-    gnupg
+    gnupg \
+    > /dev/null
 )
 then
   echo-error "Failed to install apt dependencies"
@@ -84,12 +85,13 @@ echo-step "Install Docker Engine"
 if ! (
   set -e
   apt-get update > /dev/null
-  apt-get install --quiet --yes \
+  apt-get install --yes \
     docker-ce \
     docker-ce-cli \
     containerd.io \
     docker-buildx-plugin \
-    docker-compose-plugin
+    docker-compose-plugin \
+    > /dev/null
 )
 then
   echo-error "Failed to setup the Docker repository"
