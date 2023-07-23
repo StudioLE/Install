@@ -127,3 +127,6 @@ fi
 
 # TODO: Change docker logging provider
 # Source: https://docs.docker.com/engine/install/linux-postinstall/#configure-default-logging-driver
+
+echo-success "Installed ${COMMAND}"
+echo-subsidiary "$(${COMMAND} --version)"

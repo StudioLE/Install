@@ -79,6 +79,5 @@ then
   exit 1
 fi
 
-VERSION=$(dotnet --list-sdks)
 echo-success "Installed ${PACKAGE}"
-echo-subsidiary "${VERSION}"
+echo-subsidiary "$(dotnet --list-sdks)"

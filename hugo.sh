@@ -71,6 +71,5 @@ then
   exit 1
 fi
 
-VERSION=$(${COMMAND} --version)
 echo-success "Installed ${COMMAND}"
-echo-subsidiary "${VERSION}"
+echo-subsidiary "$(${COMMAND} version)"
