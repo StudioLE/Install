@@ -56,7 +56,10 @@ echo-information "Installing ${PACKAGE}"
 echo-step "Add the Microsoft package repository"
 if ! (
   set -e
+
   declare repo_version=$(if command -v lsb_release &> /dev/null; then lsb_release -r -s; else grep -oP '(?<=^VERSION_ID=).+' /etc/os-release | tr -d '"'; fi)
+  
+  TEMP_FILE=$(mktemp --dry-run)
 
   # Download Microsoft signing key and repository
   curl "https://packages.microsoft.com/config/ubuntu/${repo_version}/packages-microsoft-prod.deb" \
@@ -70,7 +73,7 @@ if ! (
   
   # Clean up
   rm "${TEMP_FILE}"
-  )
+)
 then
   echo-error "Failed to add the Microsoft package repository"
   exit 1
