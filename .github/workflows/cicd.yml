@@ -4,17 +4,38 @@ on:
   push:
 
 jobs:
+    
+  analysis:
+    name: Analysis
+    runs-on: ubuntu-latest
+    outputs:
+      files: ${{ steps.analysis.outputs.files }}
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        
+      - name: Analysis
+        id: analysis              
+        run: |
+          FILES=$(ls *.sh | jq --raw-input | jq --slurp --compact-output)
+          echo "${FILES}"
+          echo "files=${FILES}" >> $GITHUB_OUTPUT
 
   run:
     name: Run
+    needs:
+      - analysis
     uses: ./.github/workflows/01-run.yml
     strategy:
+      fail-fast: false
       matrix:
         os:
-          - ubuntu-22.04
           - ubuntu-20.04
+          - ubuntu-22.04
+        file: ${{ fromJSON(needs.analysis.outputs.files) }}
     with:
       os: ${{ matrix.os }}
+      file: ${{ matrix.file }}
     secrets: inherit
 
   release:

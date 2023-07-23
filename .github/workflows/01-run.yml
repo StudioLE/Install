@@ -6,27 +6,24 @@ on:
       os:
         required: true
         type: string
+      file:
+        required: true
+        type: string
 
 jobs:
 
   run:
-    name: Run
+    name: ${{ inputs.file }} ${{ inputs.os }}
     runs-on: ${{ inputs.os }}
     steps:
 
       - name: Read Metadata
         run: |
           echo "OS: ${{ inputs.os }}"
-          echo "Command: ${{ inputs.command }}"
+          echo "File: ${{ inputs.file }}"
 
       - name: Checkout Repo
         uses: actions/checkout@v3
 
       - name: Run
-        run: |
-          set -euo pipefail
-          for file in *.sh
-          do
-            echo "${file}"
-            sudo bash "${file}"
-          done
+        run: sudo bash ${{ inputs.file }}
