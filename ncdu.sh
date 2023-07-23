@@ -1,39 +1,79 @@
 #!/bin/bash
-set -euo pipefail
+set -uo pipefail
 
 COMMAND="ncdu"
 SOURCE="https://dev.yorhel.nl/download/ncdu-2.2.1-linux-x86_64.tar.gz"
 DESTINATION="/usr/local/bin"
 
-if [[ $(/usr/bin/id -u) -ne 0 ]]
+echo-success () {
+  echo -e "\e[32m ✔  $1\e[0m" >&2
+}
+
+echo-information () {
+  echo -e "\e[34m ⓘ  $1\e[0m" >&2
+}
+
+echo-error () {
+  echo -e "\e[31m !  $1\e[0m" >&2
+}
+
+echo-warning () {
+  echo -e "\e[33m ⚠  $1\e[0m" >&2
+}
+
+echo-subsidiary () {
+  echo -e "\e[37m    $1\e[0m" >&2
+}
+
+echo-step () {
+  echo -e "\e[0m »  $1\e[0m" >&2
+}
+
+validate-is-root() {
+  if [[ $(/usr/bin/id -u) -ne 0 ]]
+  then
+    echo-error "Root is required"
+    exit 1
+  fi
+}
+
+validate-not-installed() {
+  WHICH=$(which "${COMMAND}")  
+  if [[ "${WHICH}" != "" ]]
+  then
+    echo-warning "${COMMAND} is already installed:"
+    echo-subsidiary "Path: ${WHICH}"
+    exit 2
+  fi
+}
+
+validate-is-root
+validate-not-installed
+
+echo-information "Installing ${COMMAND}"
+echo-subsidiary "Source: ${SOURCE}"
+echo-subsidiary "Destination: ${DESTINATION}"
+
+echo-step "Downloading and installing"
+if ! curl "${SOURCE}" \
+       --show-error \
+       --silent \
+       | tar \
+           --extract \
+           --gzip \
+           --directory "${DESTINATION}" \
+           --file - "${COMMAND}"
 then
-  echo "❗  Failed to install. Root is required." >&2
+  echo-error "Failed to download package"
   exit 1
 fi
 
-set +e
-WHICH=$(which "${COMMAND}")
-set -e
-
-if [[ "${WHICH}" != "" ]]
+if ! chmod +x "${DESTINATION}"
 then
-  echo "❗  Failed to install. ${COMMAND} is already installed:" >&2
-  echo "${WHICH}"
+  echo-error "Failed to grant execution permission"
   exit 1
 fi
 
-echo "Installing ${COMMAND}"
-echo "  Source: ${SOURCE}"
-echo "  Destination: ${DESTINATION}"
-
-curl "${SOURCE}" \
-  --progress-bar \
-   | tar \
-   --extract \
-   --gzip \
-   --directory "${DESTINATION}" \
-   --file - "${COMMAND}"
-chmod +x "${DESTINATION}/${COMMAND}"
-
-echo "Complete. Confirm with:"
-echo "  ${COMMAND} --version"
+VERSION=$(${COMMAND} --version)
+echo-success "Installed ${COMMAND}"
+echo-subsidiary "${VERSION}"
