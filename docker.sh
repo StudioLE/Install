@@ -1,6 +1,9 @@
 #!/bin/bash
 set -uo pipefail
 
+COMMAND="docker"
+DOCKER_USER="$1"
+
 # Install docker
 # Source: https://docs.docker.com/engine/install/ubuntu/
 
@@ -39,7 +42,6 @@ validate-is-root() {
 validate-is-root
 
 echo-information "Installing ${COMMAND}"
-echo-subsidiary "Source: ${SOURCE}"
 
 echo-step "Uninstall old versions"
 for PACKAGE in docker docker-engine docker.io containerd runc
@@ -97,14 +99,21 @@ fi
 # Post install steps
 # Source: https://docs.docker.com/engine/install/linux-postinstall/
 
+if [[ "${DOCKER_USER}" == "" ]]
+then
+  echo-warning "No docker user provided"
+  echo-subsidiary "Skipping post install steps"
+  exit 0
+fi
+
 echo-step "Create the docker group"
 if ! groupadd docker
 then
   echo-warning "Failed to create the docker group"
 fi
 
-echo-step "Add user to the docker group"
-if ! usermod -aG docker "${SUDO_USER}"
+echo-step "Add user ${DOCKER_USER} to the docker group"
+if ! usermod --append --groups docker "${DOCKER_USER}"
 then
   echo-warning "Failed to add user the docker group"
 fi
