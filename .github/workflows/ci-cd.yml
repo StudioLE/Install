@@ -39,6 +39,7 @@ jobs:
     secrets: inherit
 
   release:
+    if: ${{ contains(fromJSON('["refs/heads/main", "refs/heads/alpha", "refs/heads/beta"]'), github.ref) }}
     name: Create Release
     needs:
       - run
