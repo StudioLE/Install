@@ -52,7 +52,7 @@ done
 echo-step "Installing apt dependencies"
 if ! (
   set -e
-  apt-get update --quiet
+  apt-get update --quiet > /dev/null
   apt-get install --quiet --yes \
     ca-certificates \
     curl \
@@ -83,7 +83,7 @@ fi
 echo-step "Install Docker Engine"
 if ! (
   set -e
-  apt-get update --quiet
+  apt-get update --quiet > /dev/null
   apt-get install --quiet --yes \
     docker-ce \
     docker-ce-cli \
