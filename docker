@@ -96,37 +96,38 @@ then
   exit 1
 fi
 
-# Post install steps
-# Source: https://docs.docker.com/engine/install/linux-postinstall/
-
 if [[ "${DOCKER_USER}" == "" ]]
 then
   echo-warning "No docker user provided"
   echo-subsidiary "Skipping post install steps"
   exit 0
-fi
+else
 
-echo-step "Create the docker group"
-if ! groupadd docker
-then
-  echo-warning "Failed to create the docker group"
+  # Post install steps
+  # Source: https://docs.docker.com/engine/install/linux-postinstall/
+  
+  echo-step "Create the docker group"
+  if ! groupadd docker
+  then
+    echo-warning "Failed to create the docker group"
+  fi
+  
+  echo-step "Add user ${DOCKER_USER} to the docker group"
+  if ! usermod --append --groups docker "${DOCKER_USER}"
+  then
+    echo-warning "Failed to add user the docker group"
+  fi
+  
+  echo-step "Reload groups"
+  newgrp docker
+  if ! newgrp docker
+  then
+    echo-warning "Failed to reload group"
+  fi
+  
+  # TODO: Change docker logging provider
+  # Source: https://docs.docker.com/engine/install/linux-postinstall/#configure-default-logging-driver
 fi
-
-echo-step "Add user ${DOCKER_USER} to the docker group"
-if ! usermod --append --groups docker "${DOCKER_USER}"
-then
-  echo-warning "Failed to add user the docker group"
-fi
-
-echo-step "Reload groups"
-newgrp docker
-if ! newgrp docker
-then
-  echo-warning "Failed to reload group"
-fi
-
-# TODO: Change docker logging provider
-# Source: https://docs.docker.com/engine/install/linux-postinstall/#configure-default-logging-driver
 
 echo-success "Installed ${COMMAND}"
 echo-subsidiary "$(${COMMAND} --version)"
