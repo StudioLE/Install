@@ -90,7 +90,7 @@ then
   exit 1
 fi
 
-echo-success "Installed ${COMMAND}"
+echo-success "Installed kubelet, kubeadm and kubectl"
 echo-subsidiary "$(kubelet --version)"
 echo-subsidiary "$(kubeadm --version)"
 echo-subsidiary "$(kubectl --version)"
