@@ -3,17 +3,17 @@ name: Run
 on:
   workflow_call:
     inputs:
-      os:
+      file:
         required: true
         type: string
-      file:
+      os:
         required: true
         type: string
 
 jobs:
 
   run:
-    name: ${{ inputs.file }} ${{ inputs.os }}
+    name: Run
     runs-on: ${{ inputs.os }}
     steps:
 

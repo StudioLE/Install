@@ -29,13 +29,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        file: ${{ fromJSON(needs.analysis.outputs.files) }}
         os:
           - ubuntu-20.04
           - ubuntu-22.04
-        file: ${{ fromJSON(needs.analysis.outputs.files) }}
     with:
-      os: ${{ matrix.os }}
       file: ${{ matrix.file }}
+      os: ${{ matrix.os }}
     secrets: inherit
 
   release:
