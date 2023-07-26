@@ -1,98 +1,73 @@
 #!/bin/bash
 set -uo pipefail
 
-SUCCESS="TRUE"
+COMMAND="network-test"
+SOURCE="https://install.studiole.uk/src/network-test"
+DESTINATION="/usr/local/bin/${COMMAND}"
 
 echo-success () {
-  echo -ne "\e[32m ✔  $1\e[0m"
+  echo -e "\e[32m ✔  $1\e[0m" >&2
 }
 
 echo-information () {
-  echo -ne "\e[34m ⓘ  $1\e[0m"
+  echo -e "\e[34m ⓘ  $1\e[0m" >&2
 }
 
 echo-error () {
-  echo -ne "\e[31m !  $1\e[0m"
+  echo -e "\e[31m !  $1\e[0m" >&2
 }
 
 echo-warning () {
-  echo -ne "\e[33m ⚠  $1\e[0m"
+  echo -e "\e[33m ⚠  $1\e[0m" >&2
 }
 
 echo-subsidiary () {
-  echo -ne "\e[37m    $1\e[0m"
+  echo -e "\e[37m    $1\e[0m" >&2
 }
 
 echo-step () {
-  echo-break
-  echo -ne "\e[37m$1\e[0m"
+  echo -e "\e[0m »  $1\e[0m" >&2
 }
 
-echo-break () {
-  echo ""
+validate-is-root() {
+  if [[ $(/usr/bin/id -u) -ne 0 ]]
+  then
+    echo-error "Root is required"
+    exit 1
+  fi
 }
 
-echo-step "IPv4 Ping     "
-if ping 1.1.1.1 -4 -c 1 -q -w 1 > /dev/null
-then
-  echo-success "Succeeded"
-else
-  echo-error "Failed   "
-  SUCCESS=""
-fi
+validate-not-installed() {
+  WHICH=$(which "${COMMAND}")  
+  if [[ "${WHICH}" != "" ]]
+  then
+    echo-warning "${COMMAND} is already installed:"
+    echo-subsidiary "Path: ${WHICH}"
+    exit 2
+  fi
+}
 
-echo-step "IPv6 Ping     "
-if ping 2606:4700:4700::1111 -6 -c 1 -q -w 1 > /dev/null
-then
-  echo-success "Succeeded"
-else
-  echo-error "Failed   "
-  SUCCESS=""
-fi
+validate-is-root
+validate-not-installed
 
-echo-step "IPv4 DNS      "
-if ping one.one.one.one -4 -c 1 -q -w 1 > /dev/null
-then
-  echo-success "Succeeded"
-else
-  echo-error "Failed   "
-  SUCCESS=""
-fi
+echo-information "Installing ${COMMAND}"
+echo-subsidiary "Source: ${SOURCE}"
+echo-subsidiary "Destination: ${DESTINATION}"
 
-echo-step "IPv6 DNS      "
-if ping one.one.one.one -6 -c 1 -q -w 1 > /dev/null
+echo-step "Downloading and installing"
+if ! curl "${SOURCE}" \
+      --output "${DESTINATION}" \
+       --show-error \
+       --silent
 then
-  echo-success "Succeeded"
-else
-  echo-error "Failed   "
-  SUCCESS=""
-fi
-
-echo-step "IPv4 Address  "
-IPv4=$(curl ipinfo.io/ip -4 --connect-timeout 1 --silent)
-if [[ $? == 0 ]]
-then
-  echo-success "Succeeded"
-  echo-subsidiary "${IPv4}"
-else
-  echo-error "Failed   "
-  SUCCESS=""
-fi
-
-echo-step "IPv6 Address  "
-IPv6=$(curl v6.ipinfo.io/ip -6 --connect-timeout 1 --silent)
-if [[ $? == 0 ]]
-then
-  echo-success "Succeeded"
-  echo-subsidiary "${IPv6}"
-else
-  echo-error "Failed   "
-  SUCCESS=""
-fi
-
-echo-break
-
-if [[ "${SUCCESS}" == "" ]]
-then
+  echo-error "Failed to download script"
   exit 1
 fi
+
+if ! chmod +x "${DESTINATION}"
+then
+  echo-error "Failed to grant execution permission"
+  exit 1
+fi
+
+echo-success "Installed ${COMMAND}"
