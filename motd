@@ -1,0 +1,122 @@
+#!/bin/bash
+
+# Install .NET Runtime
+# Source: https://learn.microsoft.com/en-us/dotnet/core/install/linux-ubuntu
+
+PACKAGE="motd"
+DESTINATION="/etc/update-motd.d/05-custom"
+OUTPUT_LOG_DIR="/var/log/install"
+OUTPUT_LOG_FILENAME="${PACKAGE}-$(date +%Y-%m-%d_%H-%M-%S).out"
+OUTPUT_LOG_FILE="${OUTPUT_LOG_DIR}/${OUTPUT_LOG_FILENAME}"
+
+export DEBIAN_FRONTEND=noninteractive
+export NEEDRESTART_MODE=a
+export NEEDRESTART_SUSPEND=1
+
+echo-success () {
+  echo -e "\e[32m ✔  $1\e[0m" >&2
+}
+
+echo-information () {
+  echo -e "\e[34m ⓘ  $1\e[0m" >&2
+}
+
+echo-error () {
+  echo -e "\e[31m !  $1\e[0m" >&2
+}
+
+echo-warning () {
+  echo -e "\e[33m ⚠  $1\e[0m" >&2
+}
+
+echo-subsidiary () {
+  echo -e "\e[37m    $1\e[0m" >&2
+}
+
+echo-step () {
+  echo -e "\e[0m »  $1\e[0m" >&2
+}
+
+validate-is-root() {
+  if [[ $(/usr/bin/id -u) -ne 0 ]]
+  then
+    echo-error "Root is required"
+    exit 1
+  fi
+}
+
+setup-output-log () {
+  if [[ ! -d "${OUTPUT_LOG_DIR}" ]]
+  then
+    mkdir -p "${OUTPUT_LOG_DIR}"
+  fi
+  if [[ ! -f "${OUTPUT_LOG_FILE}" ]]
+  then
+    touch "${OUTPUT_LOG_FILE}"
+  fi
+  if [[ ! -w "${OUTPUT_LOG_FILE}" ]]
+  then
+    echo-error "Output log file is not writable"
+    exit 1
+  fi
+}
+
+validate-is-root
+setup-output-log
+
+echo-information "Installing ${PACKAGE}"
+echo-subsidiary "Logging verbose output to: ${OUTPUT_LOG_FILE}"
+echo-subsidiary "Follow with: tail -f ${OUTPUT_LOG_FILE}"
+
+echo-step "Install figlet"
+if ! (
+  set -e
+  apt-get update >> "${OUTPUT_LOG_FILE}"
+  apt-get install figlet --yes >> "${OUTPUT_LOG_FILE}"
+  )
+then
+  echo-error "Failed to install figlet"
+  exit 1
+fi
+
+echo-step "Downloading and installing ANSI Shadow font"
+if ! curl "https://raw.githubusercontent.com/xero/figlet-fonts/master/ANSI%20Shadow.flf" \
+      --output "/usr/share/figlet/ANSI Shadow.flf" \
+       --show-error \
+       --silent
+then
+  echo-error "Failed to download ANSI Shadow font"
+  exit 1
+fi
+
+echo-step "Disabling default motd"
+if ! (
+  set -e
+  chmod -x /etc/update-motd.d/00-header
+  chmod -x /etc/update-motd.d/10-help-text
+  chmod -x /etc/update-motd.d/50-motd-news
+  chmod -x /etc/update-motd.d/50-landscape-sysinfo
+  chmod -x /etc/update-motd.d/90-updates-available
+  )
+then
+  echo-error "Failed to disable default motd"
+  exit 1
+fi
+
+echo-step "Downloading and installing custom motd"
+if ! curl "https://install.studiole.uk/motd" \
+      --output "${DESTINATION}" \
+       --show-error \
+       --silent
+then
+  echo-error "Failed to download custom motd"
+  exit 1
+fi
+
+if ! chmod +x "${DESTINATION}"
+then
+  echo-error "Failed to grant execution permission"
+  exit 1
+fi
+
+echo-success "Installed ${PACKAGE}"

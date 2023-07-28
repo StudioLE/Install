@@ -1,0 +1,5 @@
+#!/bin/bash
+
+echo -en "\033[36m"
+cat /etc/hostname | tr '[:lower:]' '[:upper:]' | figlet -ptk -f "ANSI Shadow"
+echo -en "\033[0m"
