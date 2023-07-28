@@ -1,11 +1,19 @@
 #!/bin/bash
 set -uo pipefail
 
+# Install docker
+# Source: https://docs.docker.com/engine/install/ubuntu/
+
 COMMAND="docker"
 DOCKER_USER="${1:-}"
 
-# Install docker
-# Source: https://docs.docker.com/engine/install/ubuntu/
+OUTPUT_LOG_DIR="/var/log/install"
+OUTPUT_LOG_FILENAME="${COMMAND}-$(date +%Y-%m-%d_%H-%M-%S).out"
+OUTPUT_LOG_FILE="${OUTPUT_LOG_DIR}/${OUTPUT_LOG_FILENAME}"
+
+export DEBIAN_FRONTEND=noninteractive
+export NEEDRESTART_MODE=a
+export NEEDRESTART_SUSPEND=1
 
 echo-success () {
   echo -e "\e[32m ✔  $1\e[0m" >&2
@@ -39,25 +47,44 @@ validate-is-root() {
   fi
 }
 
+setup-output-log () {
+  if [[ ! -d "${OUTPUT_LOG_DIR}" ]]
+  then
+    mkdir -p "${OUTPUT_LOG_DIR}"
+  fi
+  if [[ ! -f "${OUTPUT_LOG_FILE}" ]]
+  then
+    touch "${OUTPUT_LOG_FILE}"
+  fi
+  if [[ ! -w "${OUTPUT_LOG_FILE}" ]]
+  then
+    echo-error "Output log file is not writable"
+    exit 1
+  fi
+}
+
 validate-is-root
+setup-output-log
 
 echo-information "Installing ${COMMAND}"
+echo-subsidiary "Logging verbose output to: ${OUTPUT_LOG_FILE}"
+echo-subsidiary "Follow with: tail -f ${OUTPUT_LOG_FILE}"
 
 echo-step "Uninstall old versions"
 for PACKAGE in docker docker-engine docker.io containerd runc
 do
-  apt-get remove "${PACKAGE}" --yes > /dev/null
+  apt-get remove "${PACKAGE}" --yes >> "${OUTPUT_LOG_FILE}"
 done
 
 echo-step "Installing apt dependencies"
 if ! (
   set -e
-  apt-get update > /dev/null
+  apt-get update >> "${OUTPUT_LOG_FILE}"
   apt-get install --yes \
     ca-certificates \
     curl \
     gnupg \
-    > /dev/null
+    >> "${OUTPUT_LOG_FILE}"
 )
 then
   echo-error "Failed to install apt dependencies"
@@ -74,7 +101,7 @@ if ! (
   echo \
     "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
     "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
-    tee /etc/apt/sources.list.d/docker.list > /dev/null
+    tee /etc/apt/sources.list.d/docker.list >> "${OUTPUT_LOG_FILE}"
 )
 then
   echo-error "Failed to setup the Docker repository"
@@ -84,14 +111,14 @@ fi
 echo-step "Install Docker Engine"
 if ! (
   set -e
-  apt-get update > /dev/null
+  apt-get update >> "${OUTPUT_LOG_FILE}"
   apt-get install --yes \
     docker-ce \
     docker-ce-cli \
     containerd.io \
     docker-buildx-plugin \
     docker-compose-plugin \
-    > /dev/null
+    >> "${OUTPUT_LOG_FILE}"
 )
 then
   echo-error "Failed to setup the Docker repository"
