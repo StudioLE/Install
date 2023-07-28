@@ -3,6 +3,7 @@ set -uo pipefail
 
 COMMAND="node_exporter"
 SOURCE="https://github.com/prometheus/node_exporter/releases/download/v1.6.1/node_exporter-1.6.1.linux-amd64.tar.gz"
+DESTINATION="/usr/local/bin/${COMMAND}"
 
 echo-success () {
   echo -e "\e[32m ✔  $1\e[0m" >&2
@@ -51,10 +52,10 @@ validate-not-installed
 
 echo-information "Installing ${COMMAND}"
 echo-subsidiary "Source: ${SOURCE}"
+echo-subsidiary "Destination: ${DESTINATION}"
 
 echo-step "Downloading package"
 TEMP_FILE=$(mktemp --dry-run)
-echo "$TEMP_FILE"
 if ! curl "${SOURCE}" \
        --location \
        --output "${TEMP_FILE}" \
@@ -66,37 +67,27 @@ then
 fi
 
 echo-step "Extracting package"
+TEMP_DIR=$(mktemp --dry-run)
 if ! (
        set -e
-       FILE_NAME=$(tar \
-         --list \
-         --gzip \
-         --file "${TEMP_FILE}" \
-         | grep 'node_exporter$')
-       echo "$FILE_NAME"
-       TEMP_DIR=$(mktemp --dry-run)
        mkdir "${TEMP_DIR}"
-       echo "$TEMP_DIR"
        tar \
          --extract \
          --gzip \
          --directory "${TEMP_DIR}" \
-         --file "${TEMP_FILE}" \
-         "${FILE_NAME}"
+         --file "${TEMP_FILE}"
        )
 then
   echo-error "Failed to extract package"
   exit 1
 fi
 
+echo-step "Installing package"
+if ! cp "${TEMP_DIR}/"*"/node_exporter" "${DESTINATION}"
+then
+  echo-error "Failed to install package"
+  exit 1
+fi
 
-#
-#echo-step "Installing package"
-#if ! dpkg -i "${TEMP_FILE}" > /dev/null
-#then
-#  echo-error "Failed to install package"
-#  exit 1
-#fi
-#
-#echo-success "Installed ${COMMAND}"
-#echo-subsidiary "$(${COMMAND} --version)"
+echo-success "Installed ${COMMAND}"
+echo-subsidiary "$(${COMMAND} --version)"
