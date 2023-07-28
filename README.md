@@ -45,6 +45,21 @@ curl -fsS https://install.studiole.uk/hugo | sudo bash
 curl -fsS https://install.studiole.uk/micro | sudo bash
 ```
 
+### [motd](https://github.com/StudioLE/Install/blob/main/src/)
+
+``` bash
+curl -fsS https://install.studiole.uk/figlet | sudo bash
+curl -fsS https://install.studiole.uk/src/disable-motd | sudo bash
+curl -fsS https://install.studiole.uk/motd-hostname| sudo bash
+curl -fsS https://install.studiole.uk/motd-system | sudo bash
+```
+
+### [network-test](https://github.com/StudioLE/Install/blob/main/src/network-test)
+
+``` bash
+curl -fsS https://install.studiole.uk/network-test | sudo bash
+```
+
 ### [ncdu](https://dev.yorhel.nl/ncdu)
 
 ``` bash
@@ -61,4 +76,10 @@ curl -fsS https://install.studiole.uk/dotnet-runtime | sudo bash
 
 ``` bash
 curl -fsS https://install.studiole.uk/dotnet-sdk | sudo bash
+```
+
+### [upgrade-packages](https://github.com/StudioLE/Install/blob/main/src/upgrade-packages)
+
+``` bash
+curl -fsS https://install.studiole.uk/upgrade-packages | sudo bash
 ```
