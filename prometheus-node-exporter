@@ -66,13 +66,24 @@ then
 fi
 
 echo-step "Extracting package"
-TEMP_DIR=$(mktemp --dry-run)
-mkdir "${TEMP_DIR}"
-if ! tar \
-      --extract \
-      --gzip \
-      --directory "${TEMP_DIR}" \
-      --file "${TEMP_FILE}"
+if ! (
+       set -e
+       FILE_NAME=$(tar \
+         --list \
+         --gzip \
+         --file "${TEMP_FILE}" \
+         | grep 'node_exporter$')
+       echo "$FILE_NAME"
+       TEMP_DIR=$(mktemp --dry-run)
+       mkdir "${TEMP_DIR}"
+       echo "$TEMP_DIR"
+       tar \
+         --extract \
+         --gzip \
+         --directory "${TEMP_DIR}" \
+         --file "${TEMP_FILE}" \
+         "${FILE_NAME}"
+       )
 then
   echo-error "Failed to extract package"
   exit 1
