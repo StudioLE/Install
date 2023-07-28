@@ -21,7 +21,7 @@ jobs:
           INSTALLERS=$(ls | jq --raw-input | jq --slurp --compact-output 'map(select(. != "CNAME" and . != "LICENSE" and . != "README.md" and . != "src"))')
           echo "${INSTALLERS}"
           echo "installers=${INSTALLERS}" >> $GITHUB_OUTPUT
-          SCRIPTS=$(ls src | jq --raw-input | jq --slurp --compact-output)
+          SCRIPTS=$(ls src | jq --raw-input | jq --slurp --compact-output  'map(select(. != "upgrade-packages"))')
           echo "${SCRIPTS}"
           echo "scripts=${SCRIPTS}" >> $GITHUB_OUTPUT
 
