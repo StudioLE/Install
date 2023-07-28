@@ -49,7 +49,10 @@ else
   echo ""
   echo -ne "${DISK_SUMMARY} \t"
   echo -ne "${MEMORY_SUMMARY} \t"
-  echo -ne "${SWAP_SUMMARY} \t"
+  if [[ "${SWAP_TOTAL}" != "0B" ]]
+  then
+    echo -ne "${SWAP_SUMMARY} \t"
+  fi
   echo -ne "${LOAD_SUMMARY} \t"
   echo ""
 fi
