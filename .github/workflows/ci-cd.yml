@@ -9,7 +9,8 @@ jobs:
     name: Analysis
     runs-on: ubuntu-latest
     outputs:
-      files: ${{ steps.analysis.outputs.files }}
+      installers: ${{ steps.analysis.outputs.installers }}
+      scripts: ${{ steps.analysis.outputs.scripts }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
@@ -17,19 +18,39 @@ jobs:
       - name: Analysis
         id: analysis              
         run: |
-          FILES=$(ls | jq --raw-input | jq --slurp --compact-output 'map(select(. != "CNAME" and . != "LICENSE" and . != "README.md" and . != "src"))')
-          echo "${FILES}"
-          echo "files=${FILES}" >> $GITHUB_OUTPUT
+          INSTALLERS=$(ls | jq --raw-input | jq --slurp --compact-output 'map(select(. != "CNAME" and . != "LICENSE" and . != "README.md" and . != "src"))')
+          echo "${INSTALLERS}"
+          echo "installers=${INSTALLERS}" >> $GITHUB_OUTPUT
+          SCRIPTS=$(ls src | jq --raw-input | jq --slurp --compact-output)
+          echo "${SCRIPTS}"
+          echo "scripts=${SCRIPTS}" >> $GITHUB_OUTPUT
 
-  run:
-    name: Run
+  test-installers:
+    name: Install
     needs:
       - analysis
-    uses: ./.github/workflows/01-run.yml
+    uses: ./.github/workflows/01-test-installers.yml
     strategy:
       fail-fast: false
       matrix:
-        file: ${{ fromJSON(needs.analysis.outputs.files) }}
+        file: ${{ fromJSON(needs.analysis.outputs.installers) }}
+        os:
+          - ubuntu-20.04
+          - ubuntu-22.04
+    with:
+      file: ${{ matrix.file }}
+      os: ${{ matrix.os }}
+    secrets: inherit
+
+  test-src:
+    name: Run
+    needs:
+      - analysis
+    uses: ./.github/workflows/02-test-src.yml
+    strategy:
+      fail-fast: false
+      matrix:
+        file: ${{ fromJSON(needs.analysis.outputs.scripts) }}
         os:
           - ubuntu-20.04
           - ubuntu-22.04
@@ -42,7 +63,7 @@ jobs:
     if: ${{ contains(fromJSON('["refs/heads/main", "refs/heads/alpha", "refs/heads/beta"]'), github.ref) }}
     name: Create Release
     needs:
-      - run
+      - test-installers
     uses: StudioLE/Actions/.github/workflows/01-semantic-release.yml@main
     secrets: inherit
     

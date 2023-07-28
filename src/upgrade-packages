@@ -1,0 +1,142 @@
+#!/bin/bash
+set -uo pipefail
+
+COMMAND="upgrade-packages"
+
+OUTPUT_LOG_DIR="/var/log/${COMMAND}"
+OUTPUT_LOG_FILENAME="${COMMAND}-$(date +%Y-%m-%d_%H-%M-%S).out"
+OUTPUT_LOG_FILE="${OUTPUT_LOG_DIR}/${OUTPUT_LOG_FILENAME}"
+
+export DEBIAN_FRONTEND=noninteractive
+export NEEDRESTART_MODE=a
+export NEEDRESTART_SUSPEND=1
+
+echo-success () {
+  echo -e "\e[32m ✔  $1\e[0m" >&2
+}
+
+echo-information () {
+  echo -e "\e[34m ⓘ  $1\e[0m" >&2
+}
+
+echo-error () {
+  echo -e "\e[31m !  $1\e[0m" >&2
+}
+
+echo-warning () {
+  echo -e "\e[33m ⚠  $1\e[0m" >&2
+}
+
+echo-subsidiary () {
+  echo -e "\e[37m    $1\e[0m" >&2
+}
+
+echo-step () {
+  echo -e "\e[0m »  $1\e[0m" >&2
+}
+
+echo-break () {
+  echo ""
+}
+
+start-timer () {
+  START_TIME=$(date +%s)
+}
+
+stop-timer () {
+  TIMER=$(($(date +%s) - START_TIME))
+  START_TIME=0
+}
+
+setup-output-log () {
+  if [[ ! -d "${OUTPUT_LOG_DIR}" ]]
+  then
+    mkdir -p "${OUTPUT_LOG_DIR}"
+  fi
+  if [[ ! -f "${OUTPUT_LOG_FILE}" ]]
+  then
+    touch "${OUTPUT_LOG_FILE}"
+  fi
+  if [[ ! -w "${OUTPUT_LOG_FILE}" ]]
+  then
+    echo-error "Output log file is not writable"
+    exit 1
+  fi
+}
+
+validate-is-root() {
+  if [[ $(/usr/bin/id -u) -ne 0 ]]
+  then
+    echo-error "Root is required"
+    exit 1
+  fi
+}
+
+setup-output-log
+validate-is-root
+
+echo-information "Upgrading packages"
+echo-subsidiary "Logging verbose output to: ${OUTPUT_LOG_FILE}"
+echo-subsidiary "Follow with: tail -f ${OUTPUT_LOG_FILE}"
+
+echo-step "Updating package lists"
+start-timer
+if apt-get update --yes >> "${OUTPUT_LOG_FILE}"
+then
+  stop-timer
+  echo-success "Updated package lists (${TIMER}s)"
+else
+  echo-error "Failed to update package lists"
+  exit 1
+fi
+
+echo-step "Upgrading existing packages"
+start-timer
+if apt-get upgrade --yes >> "${OUTPUT_LOG_FILE}"
+then
+  stop-timer
+  echo-success "Upgraded existing packages (${TIMER}s)"
+else
+  echo-error "Failed to upgrade existing packages"
+  exit 1
+fi
+
+echo-step "Upgrade to new packages"
+start-timer
+if apt-get dist-upgrade --yes >> "${OUTPUT_LOG_FILE}"
+then
+  stop-timer
+  echo-success "Upgraded to new packages (${TIMER}s)"
+else
+  echo-error "Failed to upgrade to new packages"
+  exit 1
+fi
+
+echo-step "Clean package cache"
+start-timer
+if apt-get auto-clean --yes >> "${OUTPUT_LOG_FILE}"
+then
+  stop-timer
+  echo-success "Cleaned package cache (${TIMER}s)"
+else
+  echo-error "Failed to clean package cache"
+  exit 1
+fi
+
+echo-step "Remove redundant packages"
+start-timer
+if apt-get auto-remove --yes >> "${OUTPUT_LOG_FILE}"
+then
+  stop-timer
+  echo-success "Removed redundant packages (${TIMER}s)"
+else
+  echo-error "Failed to remove redundant packages"
+  exit 1
+fi
+
+if [[ -f /var/run/reboot-required ]]
+then
+  echo-warning "A reboot is required"
+fi
+
+echo-success "Completed"
