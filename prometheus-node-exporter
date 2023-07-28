@@ -1,6 +1,10 @@
 #!/bin/bash
 set -uo pipefail
 
+# Source: 
+# https://prometheus.io/docs/guides/node-exporter/
+# https://ourcodeworld.com/articles/read/1686/how-to-install-prometheus-node-exporter-on-ubuntu-2004
+
 COMMAND="node_exporter"
 SOURCE="https://github.com/prometheus/node_exporter/releases/download/v1.6.1/node_exporter-1.6.1.linux-amd64.tar.gz"
 DESTINATION="/usr/local/bin/${COMMAND}"
@@ -89,5 +93,52 @@ then
   exit 1
 fi
 
+echo-step "Creating user for service"
+if ! (
+      set -e
+      useradd --no-create-home --shell /bin/false node_exporter
+      (cat <<EOF
+[Unit]
+Description=Node Exporter
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=node_exporter
+Group=node_exporter
+Type=simple
+ExecStart=/usr/local/bin/node_exporter --web.listen-address 10.1.0.2:9100
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
+EOF
+      ) | tee /etc/systemd/system/node_exporter.service   
+      systemctl daemon-reload
+      
+      )
+then
+  echo-error "Failed to create user"
+  exit 1
+fi
+
+echo-step "Creating service"
+if ! chown node_exporter:node_exporter /usr/local/bin/node_exporter
+then
+  echo-error "Failed to create service"
+  exit 1
+fi
+
 echo-success "Installed ${COMMAND}"
 echo-subsidiary "$(${COMMAND} --version)"
+
+echo-warning "By default the service is listening on 0.0.0.0:9100"
+echo-warning "It's recommended to change to your local IP address in:"
+echo-subsidiary "/etc/systemd/system/node_exporter.service"
+
+echo-information "Start the service with:"
+echo-subsidiary "sudo systemctl start node_exporter"
+
+echo-information "Enable the service with:"
+echo-subsidiary "sudo systemctl enable node_exporter"
