@@ -3,8 +3,14 @@
 # Install .NET Runtime
 # Source: https://learn.microsoft.com/en-us/dotnet/core/install/linux-ubuntu
 
-COMMAND="dotnet"
 PACKAGE="dotnet-sdk-7.0"
+OUTPUT_LOG_DIR="/var/log/install"
+OUTPUT_LOG_FILENAME="${PACKAGE}-$(date +%Y-%m-%d_%H-%M-%S).out"
+OUTPUT_LOG_FILE="${OUTPUT_LOG_DIR}/${OUTPUT_LOG_FILENAME}"
+
+export DEBIAN_FRONTEND=noninteractive
+export NEEDRESTART_MODE=a
+export NEEDRESTART_SUSPEND=1
 
 echo-success () {
   echo -e "\e[32m ✔  $1\e[0m" >&2
@@ -38,9 +44,28 @@ validate-is-root() {
   fi
 }
 
+setup-output-log () {
+  if [[ ! -d "${OUTPUT_LOG_DIR}" ]]
+  then
+    mkdir -p "${OUTPUT_LOG_DIR}"
+  fi
+  if [[ ! -f "${OUTPUT_LOG_FILE}" ]]
+  then
+    touch "${OUTPUT_LOG_FILE}"
+  fi
+  if [[ ! -w "${OUTPUT_LOG_FILE}" ]]
+  then
+    echo-error "Output log file is not writable"
+    exit 1
+  fi
+}
+
 validate-is-root
+setup-output-log
 
 echo-information "Installing ${PACKAGE}"
+echo-subsidiary "Logging verbose output to: ${OUTPUT_LOG_FILE}"
+echo-subsidiary "Follow with: tail -f ${OUTPUT_LOG_FILE}"
 
 echo-step "Add the Microsoft package repository"
 if ! (
@@ -71,8 +96,8 @@ fi
 echo-step "Install .NET Runtime"
 if ! (
   set -e
-  apt-get update > /dev/null
-  apt-get install ${PACKAGE} --yes > /dev/null
+  apt-get update >> "${OUTPUT_LOG_FILE}"
+  apt-get install ${PACKAGE} --yes >> "${OUTPUT_LOG_FILE}"
   )
 then
   echo-error "Failed to install .NET Runtime"
