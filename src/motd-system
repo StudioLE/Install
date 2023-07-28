@@ -8,7 +8,7 @@ LOAD_ALL=$(cat /proc/loadavg)
 LOAD_1M_PERCENT=$(echo "${LOAD_ALL}" | awk "{print (\$1/${CORES})*100}" | awk '{printf "%5.1f",$i}')
 LOAD_5M_PERCENT=$(echo "${LOAD_ALL}" | awk "{print (\$2/${CORES})*100}" | awk '{printf "%5.1f",$i}')
 LOAD_15M_PERCENT=$(echo "${LOAD_ALL}" | awk "{print (\$3/${CORES})*100}" | awk '{printf "%5.1f",$i}')
-LOAD_SUMMARY="${LOAD_1M_PERCENT}%${LOAD_5M_PERCENT}%${LOAD_15M_PERCENT}% of ${CORES}"
+LOAD_SUMMARY="${LOAD_1M_PERCENT}%${LOAD_5M_PERCENT}%${LOAD_15M_PERCENT}% of ${CORES} cores"
 
 MEMORY_PERCENT=$(free | grep Mem | awk '{print ($3/$2)*100}' | awk '{printf "%0.1f",$i}')
 MEMORY_TOTAL=$(free -h --si | grep Mem | awk '{print $2}')
@@ -32,25 +32,25 @@ echo -en "\e[${COLOR}m"
 if [[ "${LAYOUT}" == "vertical" ]]
 then  
   echo "Root disk   ${DISK_SUMMARY}"
-  echo "Load        ${LOAD_SUMMARY}"
   echo "Memory      ${MEMORY_SUMMARY}"
   if [[ "${SWAP_TOTAL}" != "0B" ]]
   then
     echo "Swap        ${SWAP_SUMMARY}"
   fi
+  echo "Load        ${LOAD_SUMMARY}"
 else
   echo -ne "Root disk \t"
-  echo -ne "    1m    5m   15m Load\t"
   echo -ne "Memory \t\t"
   if [[ "${SWAP_TOTAL}" != "0B" ]]
   then
     echo -ne "Swap \t\t"
   fi
+  echo -ne "    1m    5m   15m       Load"
   echo ""
   echo -ne "${DISK_SUMMARY} \t"
-  echo -ne "${LOAD_SUMMARY} \t"
   echo -ne "${MEMORY_SUMMARY} \t"
   echo -ne "${SWAP_SUMMARY} \t"
+  echo -ne "${LOAD_SUMMARY} \t"
   echo ""
 fi
 echo -en "\e[0m"
