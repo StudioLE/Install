@@ -1,5 +1,7 @@
 #!/bin/bash
 
-echo -en "\033[36m"
+COLOR=${1:-"34"}
+
+echo -en "\e[${COLOR}m"
 cat /etc/hostname | tr '[:lower:]' '[:upper:]' | figlet -ptk -f "ANSI Shadow"
-echo -en "\033[0m"
+echo -en "\e[0m"

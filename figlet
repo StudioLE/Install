@@ -3,8 +3,7 @@
 # Install .NET Runtime
 # Source: https://learn.microsoft.com/en-us/dotnet/core/install/linux-ubuntu
 
-PACKAGE="motd"
-DESTINATION="/etc/update-motd.d/05-custom"
+PACKAGE="figlet"
 OUTPUT_LOG_DIR="/var/log/install"
 OUTPUT_LOG_FILENAME="${PACKAGE}-$(date +%Y-%m-%d_%H-%M-%S).out"
 OUTPUT_LOG_FILE="${OUTPUT_LOG_DIR}/${OUTPUT_LOG_FILENAME}"
@@ -86,36 +85,6 @@ if ! curl "https://raw.githubusercontent.com/xero/figlet-fonts/master/ANSI%20Sha
        --silent
 then
   echo-error "Failed to download ANSI Shadow font"
-  exit 1
-fi
-
-echo-step "Disabling default motd"
-if ! (
-  set -e
-  chmod -x /etc/update-motd.d/00-header
-  chmod -x /etc/update-motd.d/10-help-text
-  chmod -x /etc/update-motd.d/50-motd-news
-  chmod -x /etc/update-motd.d/50-landscape-sysinfo
-  chmod -x /etc/update-motd.d/90-updates-available
-  )
-then
-  echo-error "Failed to disable default motd"
-  exit 1
-fi
-
-echo-step "Downloading and installing custom motd"
-if ! curl "https://install.studiole.uk/motd" \
-      --output "${DESTINATION}" \
-       --show-error \
-       --silent
-then
-  echo-error "Failed to download custom motd"
-  exit 1
-fi
-
-if ! chmod +x "${DESTINATION}"
-then
-  echo-error "Failed to grant execution permission"
   exit 1
 fi
 
