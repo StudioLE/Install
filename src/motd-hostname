@@ -1,0 +1,7 @@
+#!/bin/bash
+
+COLOR=${1:-"34"}
+
+echo -en "\e[${COLOR}m"
+cat /etc/hostname | tr '[:lower:]' '[:upper:]' | figlet -ptk -f "ANSI Shadow"
+echo -en "\e[0m"

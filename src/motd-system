@@ -1,0 +1,26 @@
+#!/bin/bash
+
+COLOR=${1:-"37"}
+LAYOUT=${2:-"horizontal"}
+
+LOAD=$(cat /proc/loadavg | awk '{print $1" " $2" "$3}')
+RAM_PERCENT=$(free | grep Mem | awk '{print ($3/$2)*100}' | awk '{printf "%0.1f",$i}')
+RAM_TOTAL=$(free -h --si | grep Mem | awk '{print $2}')
+SWAP_PERCENT=$(free | grep Swap | awk '{print ($3/$2)*100}' | awk '{printf "%0.1f",$i}')
+SWAP_TOTAL=$(free -h --si | grep Swap | awk '{print $2}')
+DISK_PERCENT=$( df -H | grep '/$' | awk '{print $5}')
+DISK_TOTAL=$( df -H | grep '/$' | awk '{print $2}')
+
+echo -en "\e[${COLOR}m"
+
+if [[ "${LAYOUT}" == "vertical" ]]
+then
+  echo "Load        ${LOAD}" 
+  echo "Memory      ${RAM_PERCENT}% of ${RAM_TOTAL}"
+  echo "Swap        ${SWAP_PERCENT} of ${SWAP_TOTAL}"
+  echo "Root disk   ${DISK_PERCENT}% of ${DISK_TOTAL}"
+else
+  echo -e "Load \t\t Memory \t Swap \t\t Root disk" 
+  echo -e "${LOAD} \t ${RAM_PERCENT}% of ${RAM_TOTAL} \t ${SWAP_PERCENT} of ${SWAP_TOTAL} \t ${DISK_PERCENT} of ${DISK_TOTAL}"
+fi
+echo -en "\e[0m"
