@@ -1,9 +1,9 @@
 #!/bin/bash
 set -uo pipefail
 
-COMMAND="network-test"
-SOURCE="https://install.studiole.uk/src/network-test"
-DESTINATION="/usr/local/bin/${COMMAND}"
+PACKAGE="network-test"
+SOURCE="https://bash.studiole.uk/${PACKAGE}"
+DESTINATION="/usr/local/bin/${PACKAGE}"
 
 echo-success () {
   echo -e "\e[32m ✔  $1\e[0m" >&2
@@ -38,10 +38,10 @@ validate-is-root() {
 }
 
 validate-not-installed() {
-  WHICH=$(which "${COMMAND}")  
+  WHICH=$(which "${PACKAGE}")  
   if [[ "${WHICH}" != "" ]]
   then
-    echo-warning "${COMMAND} is already installed:"
+    echo-warning "${PACKAGE} is already installed:"
     echo-subsidiary "Path: ${WHICH}"
     exit 2
   fi
@@ -50,7 +50,7 @@ validate-not-installed() {
 validate-is-root
 validate-not-installed
 
-echo-information "Installing ${COMMAND}"
+echo-information "Installing ${PACKAGE}"
 echo-subsidiary "Source: ${SOURCE}"
 echo-subsidiary "Destination: ${DESTINATION}"
 
@@ -70,4 +70,4 @@ then
   exit 1
 fi
 
-echo-success "Installed ${COMMAND}"
+echo-success "Installed ${PACKAGE}"

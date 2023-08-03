@@ -5,75 +5,31 @@ on:
 
 jobs:
     
-  analysis:
-    name: Analysis
-    runs-on: ubuntu-latest
-    outputs:
-      installers: ${{ steps.analysis.outputs.installers }}
-      scripts: ${{ steps.analysis.outputs.scripts }}
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v3
-        
-      - name: Analysis
-        id: analysis              
-        run: |
-          INSTALLERS=$(ls | jq --raw-input | jq --slurp --compact-output 'map(select(. != "CNAME" and . != "LICENSE" and . != "README.md" and . != "src"))')
-          echo "${INSTALLERS}"
-          echo "installers=${INSTALLERS}" >> $GITHUB_OUTPUT
-          SCRIPTS=$(ls src | jq --raw-input | jq --slurp --compact-output  'map(select(. != "upgrade-packages"))')
-          echo "${SCRIPTS}"
-          echo "scripts=${SCRIPTS}" >> $GITHUB_OUTPUT
+  index:
+    name: Index
+    uses: ./.github/workflows/01-index.yml
 
-  test-installers:
-    name: Install
-    needs:
-      - analysis
-    uses: ./.github/workflows/01-test-installers.yml
-    strategy:
-      fail-fast: false
-      matrix:
-        file: ${{ fromJSON(needs.analysis.outputs.installers) }}
-        os:
-          - ubuntu-20.04
-          - ubuntu-22.04
-    with:
-      file: ${{ matrix.file }}
-      os: ${{ matrix.os }}
-    secrets: inherit
-
-  test-src:
+  run:
     name: Run
     needs:
-      - analysis
-    uses: ./.github/workflows/02-test-src.yml
+      - index
+    uses: ./.github/workflows/02-run.yml
     strategy:
       fail-fast: false
       matrix:
-        file: ${{ fromJSON(needs.analysis.outputs.scripts) }}
+        file: ${{ fromJSON(needs.index.outputs.files) }}
         os:
           - ubuntu-20.04
           - ubuntu-22.04
     with:
       file: ${{ matrix.file }}
       os: ${{ matrix.os }}
-    secrets: inherit
 
   release:
-    if: ${{ contains(fromJSON('["refs/heads/main", "refs/heads/alpha", "refs/heads/beta"]'), github.ref) }}
-    name: Create Release
+    name: Release
+    if: ${{ contains(fromJSON('["main", "alpha", "beta"]'), github.ref_name) }}
     needs:
-      - test-installers
+      - run
     uses: StudioLE/Actions/.github/workflows/01-semantic-release.yml@main
     secrets: inherit
     
-#  publish:
-#    name: Publish
-#    needs: 
-#      - release
-#      - run
-#    if: ${{ needs.release.outputs.version != '0.0.0' }}
-#    uses: ./.github/workflows/05-publish.yml
-#    with:
-#      version: ${{ needs.release.outputs.version }}
-#    secrets: inherit

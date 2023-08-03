@@ -1,7 +1,7 @@
 #!/bin/bash
 
 PACKAGE="motd-hostname"
-SOURCE="https://install.studiole.uk/src/${PACKAGE}"
+SOURCE="https://bash.studiole.uk/${PACKAGE}"
 DESTINATION="/etc/update-motd.d/05-hostname"
 
 echo-success () {

@@ -1,0 +1,24 @@
+name: Run
+
+on:
+  workflow_call:
+    outputs:
+      files:
+        value: ${{ jobs.index.outputs.files }}
+    
+jobs:
+
+  index:
+    name: Index
+    runs-on: ubuntu-latest
+    outputs:
+      files: ${{ steps.index.outputs.files }}
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+      - name: Index
+        id: index
+        run: |
+          FILES=$(ls | jq --raw-input | jq --slurp --compact-output  'map(select(. != "CNAME" and . != "LICENSE" and . != "README.md"))')
+          echo "${FILES}"
+          echo "files=${FILES}" >> $GITHUB_OUTPUT
