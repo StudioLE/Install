@@ -78,6 +78,14 @@ curl -fsS https://install.studiole.uk/dotnet-runtime | sudo bash
 curl -fsS https://install.studiole.uk/dotnet-sdk | sudo bash
 ```
 
+### [remote-backup](https://github.com/StudioLE/Bash#remote-backup-files)
+
+``` bash
+curl -fsS https://install.studiole.uk/remote-backup-files | sudo bash
+curl -fsS https://install.studiole.uk/remote-backup-sqlite | sudo bash
+curl -fsS https://install.studiole.uk/remote-restore | sudo bash
+```
+
 ### [upgrade-packages](https://github.com/StudioLE/Bash#upgrade-packages)
 
 ``` bash
