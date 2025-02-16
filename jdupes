@@ -2,7 +2,8 @@
 set -uo pipefail
 
 COMMAND="jdupes"
-SOURCE="https://codeberg.org/jbruchon/jdupes/releases/download/v1.27.3/jdupes-1.27.3-linux-x86_64.pkg.tar.xz"
+VERSION="1.28.0"
+SOURCE="https://codeberg.org/jbruchon/${COMMAND}/releases/download/v${VERSION}/${COMMAND}-${VERSION}-linux-x86_64.pkg.tar.xz"
 DESTINATION="/usr/local/bin/${COMMAND}"
 
 echo-success () {

@@ -31,6 +31,12 @@ curl -fsS https://install.studiole.uk/docker | sudo bash
 curl -fsS https://install.studiole.uk/hugo | sudo bash
 ```
 
+### [jdupes](https://www.jdupes.com/)
+
+``` bash
+curl -fsS https://install.studiole.uk/jdupes | sudo bash
+```
+
 ### [Kubernetes](https://kubernetes.io/)
 
 ``` bash
