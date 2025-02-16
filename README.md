@@ -25,18 +25,18 @@ curl -fsS https://install.studiole.uk/broot | sudo bash
 curl -fsS https://install.studiole.uk/docker | sudo bash
 ```
 
+### [Hugo](https://gohugo.io/)
+
+``` bash
+curl -fsS https://install.studiole.uk/hugo | sudo bash
+```
+
 ### [Kubernetes](https://kubernetes.io/)
 
 ``` bash
 curl -fsS https://install.studiole.uk/docker | sudo bash
 curl -fsS https://install.studiole.uk/cri-dockerd | sudo bash
 curl -fsS https://install.studiole.uk/kubernetes | sudo bash
-```
-
-### [Hugo](https://gohugo.io/)
-
-``` bash
-curl -fsS https://install.studiole.uk/hugo | sudo bash
 ```
 
 ### [micro](https://micro-editor.github.io/)
